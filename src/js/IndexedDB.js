@@ -1,47 +1,63 @@
 class IndexedDB {
-    constructor() {
-
+    constructor(app) {
+        this.linkApp = app
+        this.db = null;
     }
 
     initialization() {
-        let db;
         let request = indexedDB.open("MyTestDatabase");
         request.onerror = function (event) {
-            alert("Why didn't you allow my web app to use IndexedDB?!");
+            console.log("error");
         };
         request.onsuccess = function (event) {
-            db = event.target.result;
-        };
-
-        const customerData = [
-            { ssn: "444-44-4444", name: "Bill", age: 35, email: "bill@company.com" },
-            { ssn: "555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }
-        ];
+            this.db = event.target.result;
+        }.bind(this);        
         request.onupgradeneeded = function (event) {
-            var db = event.target.result;
+            let db = event.target.result;
 
-            // Create an objectStore to hold information about our customers. We're
-            // going to use "ssn" as our key path because it's guaranteed to be
-            // unique - or at least that's what I was told during the kickoff meeting.
-            var objectStore = db.createObjectStore("customers", { keyPath: "ssn" });
+            if (!db.objectStoreNames.contains !== 'favorites')
+                var objectStore = db.createObjectStore("favorites", { keyPath: "id", autoIncrement: true });
+            objectStore.createIndex('id', 'id', { unigue: false });
+        };
+    }
 
-            // Create an index to search customers by name. We may have duplicates
-            // so we can't use a unique index.
-            //objectStore.createIndex("name", "name", { unique: false });
+    addFavorit(favorit) {
+        let transaction = this.db.transaction(['favorites'], 'readwrite');
+        let store = transaction.objectStore('favorites');
+        let request = store.add(favorit);
 
-            // Create an index to search customers by email. We want to ensure that
-            // no two customers have the same email, so use a unique index.
-           // objectStore.createIndex("email", "email", { unique: true });
+        request.onerror = function (event) {
+            console.log(event.terget.error.name);
+        };
+        request.onsuccess = function (event) {
+            console.log('good')
+        };
+    }
 
-            // Use transaction oncomplete to make sure the objectStore creation is 
-            // finished before adding data into it.
-            objectStore.transaction.oncomplete = function (event) {
-                // Store values in the newly created objectStore.
-                var customerObjectStore = db.transaction("customers", "readwrite").objectStore("customers");
-                customerData.forEach(function (customer) {
-                    customerObjectStore.add(customer);
-                });
-            };
+    showFavorites() {
+        let transaction = this.db.transaction(['favorites'], 'readonly');
+        let store = transaction.objectStore('favorites');
+        let index = store.index('id');
+
+        index.openCursor().onsuccess = function (event) {
+            let cursor = event.target.result;
+            if (cursor) {
+                this.linkApp.createImg(cursor.value.url, cursor.value.id);
+                cursor.continue();
+            }
+        }.bind(this);
+    }
+
+    removeFavorite(id){
+        let transaction = this.db.transaction(['favorites'], 'readwrite');
+        let store = transaction.objectStore('favorites');
+        let request = store.delete(+id);
+
+        request.onerror = function (event) {
+            console.log(event.terget.error.name);
+        };
+        request.onsuccess = function (event) {
+            console.log('remove')
         };
     }
 

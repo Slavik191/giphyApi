@@ -3,13 +3,15 @@ import '../sass/style.sass';
 
 const app = new App;
 
-//app.IndexedDB.initialization();
+app.indexedDB.initialization();
+
+
 
 [gifs, stickers, favorites].forEach(button => {
     button.addEventListener('click', (event) => {
         if(app.getImg.type !== event.target.getAttribute('data-type')){
             app.getImg.type = event.target.getAttribute('data-type');
-            app.getImg.clearImgContainer();
+            app.clearImgContainer();
             app.getImg.offset = 0;
             app.getImg.loading = true;
             app.getImg.inquiryImg();
@@ -19,7 +21,7 @@ const app = new App;
 
 search.addEventListener('click', () => {
     if(app.getImg.textSearch !== textSearch.value.split(' ').join('+').trim()){
-        app.getImg.clearImgContainer();
+        app.clearImgContainer();
         app.getImg.offset = 0;
         app.getImg.loading = true;
         app.getImg.textSearch = textSearch.value.split(' ').join('+').trim();
@@ -27,9 +29,14 @@ search.addEventListener('click', () => {
     }
 })
 
-document.addEventListener('wheel', event => {
+document.addEventListener('scroll', event => {
     if(!app.getImg.loading && document.documentElement.scrollTop + document.documentElement.clientHeight === document.body.scrollHeight){
         app.getImg.loading = true;
-        app.getImg.inquiryImg(textSearch.value);
+        app.getImg.inquiryImg();
     }
 });
+
+textSearch.addEventListener('keyup',()=>{
+    app.getImg.textSearch = textSearch.value.split(' ').join('+').trim();
+    app.getImg.inquiryImg(true);
+})
