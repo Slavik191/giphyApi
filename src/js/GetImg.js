@@ -1,12 +1,12 @@
 class GetImg {
     constructor(app) {
+        this.key = '3QilPpAzXngyRapI2zVkza4r3Fe0VTpV';
         this.linkApp = app
         this.type = 'gifs';
         this.textSearch;
         this.offset = 0;
-        this.limit = 5;
+        this.limit = 25;
         this.loading = false;
-        this.arrImages = [];
     }
 
 
@@ -17,7 +17,7 @@ class GetImg {
         }
         else {
             if (this.textSearch) {
-                fetch(`https://api.giphy.com/v1/${this.type}/search?q=${this.textSearch}&api_key=3QilPpAzXngyRapI2zVkza4r3Fe0VTpV&limit=${this.limit}&offset=${this.offset}`)
+                fetch(`https://api.giphy.com/v1/${this.type}/search?q=${this.textSearch}&api_key=${this.key}&limit=${dropdown ? 5 : this.limit}&offset=${dropdown ? 0 : this.offset}`)
                     .then(data => {
                         return data.json()
                     })

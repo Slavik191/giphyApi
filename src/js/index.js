@@ -20,7 +20,8 @@ app.indexedDB.initialization();
 })
 
 search.addEventListener('click', () => {
-    if(app.getImg.textSearch !== textSearch.value.split(' ').join('+').trim()){
+    if(app.getImg.textSearch !== ''){
+        app.clearDropDown();
         app.clearImgContainer();
         app.getImg.offset = 0;
         app.getImg.loading = true;
@@ -37,6 +38,7 @@ document.addEventListener('scroll', event => {
 });
 
 textSearch.addEventListener('keyup',()=>{
+    app.clearDropDown();
     app.getImg.textSearch = textSearch.value.split(' ').join('+').trim();
     app.getImg.inquiryImg(true);
 })

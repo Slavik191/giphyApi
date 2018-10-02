@@ -15,9 +15,10 @@ class IndexedDB {
         request.onupgradeneeded = function (event) {
             let db = event.target.result;
 
-            if (!db.objectStoreNames.contains !== 'favorites')
-                var objectStore = db.createObjectStore("favorites", { keyPath: "id", autoIncrement: true });
-            objectStore.createIndex('id', 'id', { unigue: false });
+            if (!db.objectStoreNames.contains !== 'favorites'){
+                let objectStore = db.createObjectStore("favorites", { keyPath: "id", autoIncrement: true });
+                objectStore.createIndex('id', 'id', { unigue: false });
+            }               
         };
     }
 

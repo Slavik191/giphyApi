@@ -6,6 +6,7 @@ class App {
         this.indexedDB = new IndexedDB(this);
         this.getImg = new GetImg(this);
         this.arrImages = [];
+        this.arrImagesSearch = [];
     }
 
     createImg(url, id = null) {
@@ -14,9 +15,8 @@ class App {
         let heart = document.createElement('div');
         if(this.getImg.type === 'favorites'){
             div.id = `${id}`;
-            heart.style.background = 'red';
+            heart.className = 'cross';
             heart.addEventListener('click', event => {
-                event.target.style.background = 'inherit'; 
                 this.indexedDB.removeFavorite(event.target.parentNode.id);
                 imgsContainer.removeChild(event.target.parentNode);
                 this.arrImages.slice
@@ -26,27 +26,46 @@ class App {
             })
         }
         else{
-            heart.addEventListener('click', event => {
-                event.target.style.background = 'red';
-                this.indexedDB.addFavorit({ url: event.target.parentNode.firstChild.src })
-            })
+            heart.className = 'heart';
+            let add = (() =>{
+                let add = true;
+                return event => {            
+                    if(add){
+                        this.indexedDB.addFavorit({ url: event.target.parentNode.firstChild.src })
+                        add = false
+                    }                   
+                }
+            })()
+            heart.addEventListener('click', add)
         }
-        heart.className = 'heart';
         let img = document.createElement('img');
         img.src = url;
         div.appendChild(img);
-        div.appendChild(heart);
+        div.appendChild(heart);        
         this.arrImages.push(div);
         imgsContainer.appendChild(div);
     }
 
     createDropDown(url){
         let div = document.createElement('div');
-        div.className = 'imgContainer';
+        div.className = 'imgSearchContainer';
+        let heart = document.createElement('div');
+        heart.className = 'heart';
+        let add = (() =>{
+            let add = true;
+            return event => {            
+                if(add){
+                    this.indexedDB.addFavorit({ url: event.target.parentNode.firstChild.src })
+                    add = false
+                }                   
+            }
+        })()
+        heart.addEventListener('click', add)
         let img = document.createElement('img');
         img.src = url;
         div.appendChild(img);
-        this.arrImages.push(div);
+        div.appendChild(heart);
+        this.arrImagesSearch.push(div);
         dropdown.appendChild(div);
     }
 
@@ -55,6 +74,13 @@ class App {
             imgsContainer.removeChild(img);
         });
         this.arrImages = [];
+    }
+
+    clearDropDown() {
+        this.arrImagesSearch.forEach(img => {
+            dropdown.removeChild(img);
+        });
+        this.arrImagesSearch = [];
     }
 }
 
